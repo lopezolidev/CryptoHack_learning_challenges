@@ -38,3 +38,4 @@ for i in range(0, len(out)):
     # appending to solution string
     
 print(res_bytes)
+# crypto/Base+64+Encoding+is+Web+Safe/
