@@ -22,3 +22,4 @@ for number in codes:
     # appending the character to the result string
 
 print(f"The encoded string is: {result}")
+# The encoded string is: crypto{ASCII_pr1nt4bl3}
