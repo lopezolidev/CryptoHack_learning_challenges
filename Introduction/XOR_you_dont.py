@@ -5,94 +5,104 @@ The only hint to help us is the flag style and the format of the ciphered text
 
 - flag format: crypto{ <- its at most how we can be sure of the content of the flag
 - ciphered text format: hexadecimal
-- key: unknown -> 'crypto{' is the format of the key needed to unlock the message
+- key: unknown 
 '''
 
 ciphered_text = '0e0b213f26041e480b26217f27342e175d0e070a3c5b103e2526217f27342e175d0e077e263451150104'
 # print(len(ciphered_text)) # 84 -> 12 * 7 -> 2 hex digits XOR with each decoded from key 
 
-hint = 'crypto{'# has 7 characters 
-# -> the fact is that the original key uses a letter additional to { denotes the '+' character
-# before the 'y' in the partial solution  
+mssg_prime = 'crypto{'
+# first 7 characters of the original message
 
-pairs_ints = []
-# here the integervalues from decoded hex will appear
+ciphered_ints = []
+# list of ints from the ciphered text
 
 for i in range(0, len(ciphered_text), 2):
-    # iterate among the list of ciphered hex in pairs
-    x = ciphered_text[i:i+2]
-    # taking up a byte (two nibbles = two hex digits)
-    
-    x = int(x, 16)
-    # turning into decimal from base 16
+    bytes_of_hex = bytes.fromhex(ciphered_text[i:i+2])
+    # first extracting the byte represented by 2 hex digits
 
-    pairs_ints.append(x)
-    # appending the integer value to the pairs array
+    clean_bytes = ord(bytes_of_hex)
+    # interpreting as integers each byte
 
-numeric_hint = []
+    ciphered_ints.append(clean_bytes)
+    # appending the ints from hex pair to list of integers from ciphered text
 
-for char in hint:
-    num = ord(char)
-    # numeric value of each character of the hint
+ciphered_ints_short = ciphered_ints[0:7]
+# first seven characters of ciphered text so as
+# C = M ⊕ K -> c_1 = m_1 ⊕ k_1 ; c_2 = m_2 ⊕ k_2 ; c_3 = m_3 ⊕ k_3 ...
+# therefore: 
+#     m_1 ⊕ c_1 = m_1 ⊕ m_1 ⊕ k_1 => m_1 ⊕ c_1 = 0 ⊕ k_1 (Self-Inverse)
+#     m_1 ⊕ c_1 = 0 ⊕ k_1 => m_1 ⊕ c_1 = k_1 (Identity)
+# Subsequently we'll obtain: 
+#   m_2 ⊕ c_2 = k_2
+#   m_3 ⊕ c_3 = k_3
+#   m_4 ⊕ c_4 = k_4
+#   m_5 ⊕ c_5 = k_5
+#   m_6 ⊕ c_6 = k_6
+#   m_7 ⊕ c_7 = k_7
 
-    numeric_hint.append(num)
-    # attaching each numeric value of hint into an array
 
-decoded_string = ''
-# string to store decoded solution
+# now we convert the first 7 character of original message (hint) in ints
+mssg_prime_int = []
 
-for encoded in range(0, len(pairs_ints), 7):
-    temp = pairs_ints[encoded: encoded + 7]
-    # temporal value of 7-integer chunks to decode using hint by XOR property of Self-inverse
+for i in range(0, len(mssg_prime)):
+    character_value = ord(mssg_prime[i])
+    # ascii value of each character from hint
 
-    for num, key in zip(temp, numeric_hint):
-        xored_value = num ^ key
-        # xoring each numeric character with the corresponding character of numeric hint
+    mssg_prime_int.append(character_value)
+    # appending the int value of each character from int to a list
 
-        converted_xored_value = chr(xored_value)
-        # turning into string the xored value 
 
-        decoded_string += converted_xored_value
-        # appending solution to decoded_string solution
+# unlocking the key from first characters from ciphered message
 
-print(decoded_string)
-'''
-Discovered that:
+key = []
+# list to store the key
 
-myXORke+y_Q
-           HOMe$~seG8bGURNDFWg)a|TM!an
-'''
+for j in range(0, 7):
+    k_temp = ciphered_ints_short[j] ^ mssg_prime_int[j]
+    # XOR'ing c_1 and m_1 -> m_1 ⊕ m_1 ⊕ k_1 = k_1
 
-# now then we need to apply this partial key (myXORkey) to find the actual flag
+    key.append(k_temp)
+    # appending each character of the key to the list
 
-partial_key = 'myXORkey'
-# length of 8
+# displaying the key as characters
 
-decoded_string = ''
-# restarting decoded string
+key_string = ''
 
-numeric_key = []
-# array of numeric representation of partial key
+for k in range(0,7):
+    k_temp_ascii = chr(key[k])
+    # obtaining char value according to ASCII code for that character
 
-for c in partial_key:
-    num = ord(c)
+    key_string += k_temp_ascii
+    # appending that character of key into the string
 
-    numeric_key.append(num)
-# now we have the integer representation of the partial key
+print(key_string)
+# myXORke -> clearly, the completed text is: myXORkey (missing y)
 
-for encoded in range(0, len(pairs_ints), 8):
-    temp = pairs_ints[encoded: encoded + 8]
-    # temporal value of 8-integer chunks to decode using hint by XOR property of Self-inverse
+y_value = ord('y')
+# ascii code value of 'y' character
 
-    for num, key in zip(temp, numeric_key):
-        xored_value = num ^ key
-        # xoring each numeric character with the corresponding character of numeric hint
+key.append(y_value)
+# appending missing value to the key -> now with length 8
 
-        converted_xored_value = chr(xored_value)
-        # turning into string the xored value 
+# now it's time to unlock the entire ciphered text
 
-        decoded_string += converted_xored_value
-        # appending solution to decoded_string solution
+original_mssg = ''
 
-print(decoded_string)
-# voila! crypto{1f_y0u_Kn0w_En0uGH_y0u_Kn0w_1t_4ll}
+for i in range(0, len(ciphered_ints), len(key)):
+    ciphered_substring = ciphered_ints[i: i+len(key)]
+    # chunking a substring from ciphered int list to unlock it with key list
+
+    for c, k in zip(ciphered_substring, key):
+        unlocked_int = c ^ k
+        # XOR'in each ciphered substrind character with each character from key
+
+        unlocked_character = chr(unlocked_int)
+        # turning into character the unlocked int
+
+        original_mssg += unlocked_character
+        # appending the unlocked character to original message solution
+
+# printing the flag
+print(original_mssg)
+# crypto{1f_y0u_Kn0w_En0uGH_y0u_Kn0w_1t_4ll}-
