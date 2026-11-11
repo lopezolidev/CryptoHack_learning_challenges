@@ -26,7 +26,7 @@ def modulus(a, mod_n):
 a = 11
 mod_n = 6
 
-b = 8146798528947
+b = 81467985235345348947
 mod_m = 17
 
 short_number = modulus(a, mod_n)
