@@ -36,7 +36,7 @@ Just as in F_29, if x^2 ≡ a mod p, then (-x)^2 ≡ a mod p, giving two valid
 roots in F_p. The goal is to find the unique quadratic residue from the given
 list, compute both roots, and return the larger one.
 
-As x is contained in the field F_p, and that 'p' is an odd prime, making x - p
+As x is contained in the field F_p, and that 'p' is an odd prime, making p - x
 will yield the additive inverse of 'x', resulting in two unique distinct numbers.
 
 This way we'll select the largest as the flag.
@@ -53,7 +53,7 @@ ints = [250818412046959044758940829741920077186429318110403245431821300888042390
 def find_quad_res(list_of_ints, prime):
     '''
     Returns the quadratic residue based of the list using the Legendre Symbol.
-    Input: list_of_ints (integer), prime (the odd prime, defines F_p)
+    Input: list_of_ints (list of integer), prime (the odd prime, defines F_p)
     Output: quadratic_residue (integer)
     '''
 
