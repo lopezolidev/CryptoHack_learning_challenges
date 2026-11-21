@@ -107,6 +107,15 @@ def find_sylow(prime):
     # and returning the S exponent
     
 
+def min(a, b):
+    '''
+    A function that returns the minimum from two values
+    '''
+    
+    if a < b:
+        return a
+    return b
+
 
 def mod_square_root(a, prime):
     '''
@@ -129,4 +138,58 @@ def mod_square_root(a, prime):
     # now let's find 'q' and 's'
     q, s = find_sylow(prime)
 
+    for z in range(2, prime):
+        z_legendre = pow(z, (prime - 1)//2, prime)
+        if z_legendre == (prime -1) :
+            break
+        # finding the lowest z in the field that satisfies: (z / p) ≡ -1
 
+    c = pow(z, q, prime)
+    # c ≡ z^q mod p
+
+    r = pow(a, (q + 1)//2, prime)
+    # r ≡ a^((q + 1)/2)
+
+    m = s % prime
+    # m ≡ s 
+
+    t = pow(a, q, prime)
+    # t ≡ a^q mod p
+
+
+    while t != 1:
+
+        for i in range(1, m):
+            if pow(t, pow(2, i), prime) == 1:
+                break
+        # finding the lowest i such that: t ^ (2 ^ i) ≡ 1
+
+        exponent_of_c = pow(2, m - i - 1)
+
+        b = pow(c, exponent_of_c, prime)
+        # c ≡ c ^ (2 ^ (m - i - 1))
+
+        r = (r * b) % prime
+        # r ≡ r * b
+
+        t = (t * pow(b, 2, prime)) % prime
+        # t ≡ t * b^2
+
+        c = pow(b, 2, prime)
+        # c ≡ b^2
+
+        m = i
+        # m ≡ i
+    
+    return min(r, prime - r)
+    # returning the minimum root among r and p-r 
+
+min_root = mod_square_root(a, p)
+
+print(f"The square root of {a} is: {min_root}")
+
+
+
+
+
+        
