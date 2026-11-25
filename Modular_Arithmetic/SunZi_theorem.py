@@ -1,64 +1,68 @@
 '''
-Given an arbitrary integer set a^i, and a set of pairwise coprime integers n^i
-( {n^1, n^2, ..., n^i}: gcd(n^i, n^j) = 1), the following set of linear 
+Given an arbitrary integer set a_i, and a set of pairwise coprime integers n_i
+( {n_1, n_2, ..., n_i}: gcd(n_i, n_j) = 1), the following set of linear 
 congruences hold:
-x ≡ a^1 mod n^1
-x ≡ a^2 mod n^2
+x ≡ a_1 mod n_1
+x ≡ a_2 mod n_2
 ...
-x ≡ a^n mod n^n
+x ≡ a_n mod n_n
 
-Exists an unique solution x ≡ a mod N, where N = n^1 * n^2 * ... * n^n
+Exists an unique solution x ≡ a mod N, where N = n_1 * n_2 * ... * n_n
 
-Therefore, given x ≡ a^i mod n^i for a certain congruence, 
-N^j * y^j ≡ 1 mod n^j, where N^j = N / n^j
+Therefore, given x ≡ a_i mod n_i for a certain congruence, 
+N_j * y_j ≡ 1 mod n_j, where N_j = N / n_j
 
 Finally, this solution is:
-x ≡ (Sum, from i = 1, of: a^i * N^i * y^i) mod N
+x ≡ (Sum, from i = 1, of: a_i * N_i * y_i) mod N
 '''
 
-set_of_congruences = [(2, 5),(3, 11),(5, 17)]
 # each congruence of the form:
 # x ≡ 2 mod 5
 # x ≡ 3 mod 11
 # x ≡ 5 mod 17
+set_of_congruences = [(2, 5),(3, 11),(5, 17)]
+
 
 def sunzi_theorem(congruences):
     '''
-    Process each congruence to obtain N, y^i and finally integer x that satisfies
+    Process each congruence to obtain N, y_i and finally integer x that satisfies
     all the congruences
     input: list of tuples [(int, int)]
     output: integer
     '''
-
-    N = 1
     # element to multiply each modulus to obtain N
+    N = 1
     
+    # iterate over each congruence to obtain modulus
     for pair in congruences:
         _, modulus = pair
         N *= modulus
-    # iterate over each congruence to obtain modulus
-
+    
+    # value for making last multiplication and iteration    
     x = 0
-    # value for making last multiplication and iteration
+    
     
     for pair in congruences:
+        # now we have N_i = N / n_i
         remainder, modulus = pair
         factor = N // modulus
-        # now we have N^i = N / n^i
-
+        
+        # N_i mod n_i
         reduction = factor % modulus
-        # N^i mod n^i
-
+        
+        # this line has to change in order for scalability
         for i in range(1, modulus):
+        # finding modular inverse of N_i
+        # N_i * y_i ≡ 1 mod n_i
             full_product = (reduction * i) % modulus
     
             if full_product == 1:
                 break
-        # finding modular inverse of N^i
-        # N^i * y^i ≡ 1 mod n^i
 
+
+        # making the product of a_i * N_i * y_i
         x += (remainder * factor * i)
-        # making the product of a^i * N^i * y^i
+        
        
 
     x %= N
