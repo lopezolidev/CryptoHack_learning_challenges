@@ -22,6 +22,63 @@ x ≡ (Sum, from i = 1, of: a_i * N_i * y_i) mod N
 # x ≡ 5 mod 17
 set_of_congruences = [(2, 5),(3, 11),(5, 17)]
 
+def extended_gcd(a, b):
+    '''
+    Using extended Euclids algorithm, we will find the (x,y) coefficients that
+    accompany 'a' and 'b' in the Bézout's identity:
+    
+    ax + by = d
+    '''
+    a_copy = a
+    b_copy = b
+
+    if a < b:
+        t = a
+        a = b
+        b = t
+        # swapping values
+
+
+    # initial state
+    x_a , y_a = (1 , 0)
+    a = x_a * a + y_a * b
+
+    x_b , y_b = (0 , 1)
+    b = x_b * a + y_b * b
+    # Dividend (a) and divisor (b) are a linear combination of both of them
+
+    while b != 0:
+        q = a // b
+        # quotient
+
+        r = a - q * b
+        # residue calculation
+
+        x_r = x_a - q * x_b
+        # calculating coefficients of 'a' component
+
+        y_r = y_a - q * y_b
+        # calculating coefficients of 'b' component
+
+        if r == 0:
+            if a_copy < b_copy:
+                return (b, y_b, x_b)
+            return (b, x_b, y_b)            
+        # 'b' became 'a' (dividend), which in this point is the GCD
+        # x_b is the x's component of 'a', the current coefficient when that happened
+        # y_b is the y's component of 'b', the current coefficient when that happened
+            
+        a = b
+        b = r
+        # updating divisor and dividend
+
+        x_a = x_b
+        x_b = x_r
+        # updating x component for 'a' and 'b'
+
+        y_a = y_b
+        y_b = y_r
+        # updating y component for 'a' and 'b'
 
 def sunzi_theorem(congruences):
     '''
@@ -50,18 +107,25 @@ def sunzi_theorem(congruences):
         # N_i mod n_i
         reduction = factor % modulus
         
-        # this line has to change in order for scalability
-        for i in range(1, modulus):
-        # finding modular inverse of N_i
-        # N_i * y_i ≡ 1 mod n_i
-            full_product = (reduction * i) % modulus
-    
-            if full_product == 1:
-                break
+        '''
+Using extended GCD, we can formulate the missing factor to find y_i in O(logn). 
+This is because we can rewrite the problem like so:
 
+N_i * y_i ≡ 1 mod n_i
+N_i * y_i + n_i * k_i = 1 (as the reduction N_i and n_i are coprime always)
+
+As n_i*k_i is divisible by n_i, n_i*k_i = 0, therefore:
+
+N_i * y_i = 1
+leaving only the first coefficient as the one that matters in the operation and 
+the one we're looking for
+        '''
+        _, u, _ = extended_gcd(reduction, modulus)    
+        # as Euclids may return this value negative
+        u %= modulus
 
         # making the product of a_i * N_i * y_i
-        x += (remainder * factor * i)
+        x += (remainder * factor * u)
         
        
 
